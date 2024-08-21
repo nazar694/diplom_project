@@ -1,0 +1,68 @@
+{% extends 'main/base.html' %}
+{% load static%}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'main/css/login.css' %}">
+    <div class="main-div">
+        <div class="container">
+            <div class="row equal">
+                {% if has_place %}
+                    {% for place in places %}
+                    <div class="col-md-5 mx-auto my-2">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="card card-body">
+                                <div class="text-center">
+                                    <h2 class="section-heading text-uppercase">Зарезервоване місце</h2>
+                                    <h3 class="section-subheading">Hello, {{ request.user }}, ось ваше зарезервоване місце</h3>
+                                </div>
+
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <img class="img-fluid " src="{{ place.reserved_qr.url }}" alt="..." />
+                                </div>
+
+
+                                <div>
+                                    <div class="text-center">
+                                        <h3>{{ place.parking }} #{{ place.number }}</h3>
+                                        <h4>{{ place.parking.street }}</h4>
+                                        <p>Зарезервовано з {{ place.start_time_reserved|date:'H:i d/m' }} по {{ place.end_time_reserved|date:'H:i d/m' }} </p>
+                                    </div>
+                                </div>
+
+                                <div class="row px-3 justify-content-center">
+                                    <div class="col-lg-6 col-sm-6 ">
+                                        <a href="{% url 'index' %}"><input class="btn btn-primary my-2" type="button"  value="На головну"/></a>
+                                    </div>
+
+                                    <div class="col-lg-6 col-sm-6 ">
+                                        <input type="hidden" id="parking_place_id" name="parking_id" value="{{ place.id }}">
+                                        <input class="btn btn-primary my-2" type="submit" value="Відмінити резервування"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="col-md-5 mx-auto">
+                    {% csrf_token %}
+                    <div class="card card-body">
+                        <div class="text-center">
+                            <h2 class="section-heading text-uppercase">Зарезервоване місце</h2>
+                            <h3 class="section-subheading">Hello, {{ request.user }}, у вас немає зарезервованих місць</h3>
+                        </div>
+                        <img class="img-fluid" src="{% static 'main/assets/img/parking/no_qr.png' %}" alt="..." />
+
+                        <div class="row px-3 justify-content-center">
+                            <div class="col-lg-6 col-sm-6 ">
+                                <a href="{% url 'index' %}"><input class="btn btn-primary my-2" type="button"  value="На головну"/></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

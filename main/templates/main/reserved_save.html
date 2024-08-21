@@ -1,0 +1,42 @@
+{% extends 'main/base.html' %}
+{% load static%}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'main/css/login.css' %}">
+    <div class="main-div">
+        <div class="container">
+            <div class="row">
+                {% for place in places %}
+                    <div class="col-md-7 mx-auto my-2">
+                            <div class="card card-body">
+                                <div class="text-center">
+                                    <h2 class="section-heading text-uppercase">Зарезервоване місце користувачем {{ place.reserved_by }}</h2>
+                                </div>
+
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <img class="img-fluid " src="{{ place.reserved_qr.url }}" alt="..." />
+                                </div>
+
+
+                                <div>
+                                    <div class="text-center">
+                                        <h3>{{ place.parking }} #{{ place.number }}</h3>
+                                        <h4>{{ place.parking.street }}</h4>
+                                        <p>Зарезервовано з {{ place.start_time_reserved|date:'H:i d/m' }} по {{ place.end_time_reserved|date:'H:i d/m' }} </p>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                {% endfor %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="col-md-7 mx-auto my-2">
+                        <input class="btn btn-primary my-2 bg-white text-black" type="submit" value="Зберегти"/>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

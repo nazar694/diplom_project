@@ -1,0 +1,408 @@
+{% extends 'main/base.html' %}
+{% load static%}
+{% block content %}
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav" style="background-color: #212529;">
+                <div class="container">
+                    <a class="navbar-brand" href="{% url 'index' %}"><img src="{% static 'main/assets/img/navbar-logo.png' %}" alt="..." /></a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                        Меню
+                        <i class="fas fa-bars ms-1"></i>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarResponsive">
+                        <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+                            <li class="nav-item"><a class="nav-link" href="#about">Розміщення</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#portfolio">Паркінги</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#contact">Контакти</a></li>
+                            {% if  request.user.is_anonymous %}
+                                <li class="nav-item"><a class="btn btn-primary" href="{% url 'login' %}">Увійти</a>
+                            {% else %}
+                                <li class="nav-item nav-link" style="pointer-events: none; color: #ffc800;">Hello, {{ request.user }}</li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'reserved' %}">Зарезервовані місця</a></li>
+                                <li class="nav-item "><a class="btn btn-primary " href="{% url 'logout' %}">Вийти</a>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+    <!-- Masthead-->
+    <header class="masthead" style="background-image: url('../../static/main/assets/img/header-bg-foto.jpg');">
+                <div class="container">
+                    <div class="masthead-heading text-uppercase">Раді вас бачити</div>
+                    <div class="masthead-subheading">Готові припаркувати своє авто?!</div>
+                    <a class="btn btn-primary btn-xl text-uppercase" href="#services">Переглянути</a>
+                </div>
+            </header>
+    <!-- Services-->
+    <section class="page-section" id="services">
+                <div class="container">
+                    <div class="text-center">
+                        <h2 class="section-heading text-uppercase">Чому ми?</h2>
+                        <h3 class="section-subheading text-muted">Ми пропонуємо</h3>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <span class="fa-stack fa-4x">
+                                <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                                <i class="fas fa-credit-card fa-stack-1x fa-inverse"></i>
+                            </span>
+                            <h4 class="my-3">Онлайн оплату</h4>
+                            <p class="text-muted">Оплачуйте зарезервовані вами місця у зручний для вас спосіб</p>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="fa-stack fa-4x">
+                                <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                                <i class="fas fa-laptop fa-stack-1x fa-inverse"></i>
+                            </span>
+                            <h4 class="my-3">Адаптивний дизайн</h4>
+                            <p class="text-muted">В дорозі? Користуйтесь телефоном!</p>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="fa-stack fa-4x">
+                                <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                                <i class="fas fa-calendar-check fa-stack-1x fa-inverse"></i>
+                            </span>
+                            <h4 class="my-3">Планування</h4>
+                            <p class="text-muted">Резервуй місця у потрібний для тебе час</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+    <!-- About-->
+    <section class="page-section bg-light" id="about">
+                <div class="container">
+                    <div class="text-center">
+                        <h2 class="section-heading text-uppercase">Розміщення</h2>
+                        <h3 class="section-subheading text-muted">Розсташування усіх паркінгів на карті</h3>
+                    </div>
+
+                    <!-- GOOGLE MAPS-->
+                    <div id="map" style="height: 500px"></div>
+                    <script>
+                        async function initMap () {
+                            const { AdvancedMarkerView } = await google.maps.importLibrary("marker");
+                            const centerMap = { lat: 49.0608454, lng: 31.099644}
+                            mapOptions = {
+                                center: centerMap,
+                                zoom : 6,
+                                mapId: "DEMO_MAP_ID",
+
+                            }
+
+                            MyMap = new google.maps.Map(document.getElementById("map"),mapOptions);
+
+                            function addMarker (lat,lng,name,street, urls) {
+                                var marker = new google.maps.marker.AdvancedMarkerElement({
+                                    map: MyMap,
+                                    position: {lat: lat, lng: lng},
+                                });
+                                var info = "<h6>" + name + "</h6> <br> <text>" + street + "</text> <br> <a href='" + urls +"' target='_blank' ><strong>Відкрити карту</strong></a>"
+                                var InfoWindow = new google.maps.InfoWindow({
+                                    content: info
+                                })
+
+                                var is_InfoWindow = false
+                                marker.addListener('click', ()=> {
+                                    if(!is_InfoWindow){
+                                        InfoWindow.open(MyMap, marker)
+                                        is_InfoWindow = true
+                                    }
+                                    else{
+                                        InfoWindow.close(MyMap, marker)
+                                        is_InfoWindow = false
+                                    }
+                                })
+                            }
+
+                            {% if parkings %}
+                                {% for parking_area in parkings %}
+                                    addMarker({{parking_area.lat}}, {{parking_area.lng}},"{{parking_area.name}}","{{parking_area.street}}","{{parking_area.urls}}");
+                                {% endfor %}
+                            {% endif %}
+
+                        }
+                    </script>
+
+                </div>
+            </section>
+
+    <!-- Portfolio Grid-->
+    <section class="page-section" id="portfolio">
+                <div class="container">
+                    <div class="text-center">
+                        <h2 class="section-heading text-uppercase">Паркінги</h2>
+                        <h3 class="section-subheading text-muted">Всі паркінги та паркомісця</h3>
+                    </div>
+                    <div class="row uk-grid-match">
+                        {% if parkings %}
+                            {% for parking_area in parkings %}
+                            <div id="post" class="col-lg-4  col-sm-6 mb-4">
+                                <div class="portfolio-item">
+                                    <a class="portfolio-link" data-bs-toggle="modal" href="#parkingModal{{ parking_area.id }}">
+                                        <div class="portfolio-hover">
+                                            <div class="portfolio-hover-content"><i class="fas fa-plus fa-3x"></i></div>
+                                        </div>
+                                        <img class="img-fluid" src="media/{{ parking_area.img }}" alt="..." />
+                                    </a>
+                                    <div class="portfolio-caption">
+                                        <div class="portfolio-caption-heading">{{ parking_area.name }}</div>
+                                        <div class="portfolio-caption-subheading text-muted">{{ parking_area.street }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center">
+                                <h3 class="section-heading text-uppercase">Пусто.....</h3>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+    <!-- Contact-->
+    <section class="page-section" id="contact">
+                <div class="container">
+                    <div class="text-center">
+                        <h2 class="section-heading text-uppercase">Контакти</h2>
+                        <h3 class="section-subheading text-muted">Якщо у вас є питання чи пропозиції, звертайтесь</h3>
+                    </div>
+                    <!-- * * * * * * * * * * * * * * *-->
+                    <!-- * * SB Forms Contact Form * *-->
+                    <!-- * * * * * * * * * * * * * * *-->
+                    <form id="contactForm" data-sb-form-api-token="API_TOKEN">
+                        <div class="row align-items-stretch mb-5">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <!-- Name input-->
+                                    <input class="form-control" id="name" type="text" placeholder="П.І.Б. *" data-sb-validations="required" />
+                                    <div class="invalid-feedback" data-sb-feedback="name:required">Введіть П.І.Б.</div>
+                                </div>
+                                <div class="form-group">
+                                    <!-- Email address input-->
+                                    <input class="form-control" id="email" type="email" placeholder="Електронна пошта *" data-sb-validations="required,email" />
+                                    <div class="invalid-feedback" data-sb-feedback="email:required">Введіть електронну адресу.</div>
+                                    <div class="invalid-feedback" data-sb-feedback="email:email">Електронна адреса недійсна.</div>
+                                </div>
+                                <div class="form-group mb-md-0">
+                                    <!-- Phone number input-->
+                                    <input class="form-control" id="phone" type="tel" placeholder="Номер телефону *" data-sb-validations="required" />
+                                    <div class="invalid-feedback" data-sb-feedback="phone:required">Потрібен номер телефону.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group form-group-textarea mb-md-0">
+                                    <!-- Message input-->
+                                    <textarea class="form-control" id="message" placeholder="Ваше повідомлення *" data-sb-validations="required"></textarea>
+                                    <div class="invalid-feedback" data-sb-feedback="message:required">Пусте повідомлення.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Submit success message-->
+                        <!---->
+                        <!-- This is what your users will see when the form-->
+                        <!-- has successfully submitted-->
+                        <div class="d-none" id="submitSuccessMessage">
+                            <div class="text-center text-white mb-3">
+                                <div class="fw-bolder">Повідомлення успішно надіслане!</div>
+                            </div>
+                        </div>
+                        <!-- Submit error message-->
+                        <!---->
+                        <!-- This is what your users will see when there is-->
+                        <!-- an error submitting the form-->
+                        <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3">Помилка при відправлені повідомлення!</div></div>
+                        <!-- Submit Button-->
+                        <div class="text-center"><button class="btn btn-primary btn-xl text-uppercase disabled" id="submitButton" type="submit">Відправити повідомлення</button></div>
+                    </form>
+                </div>
+            </section>
+    <!-- Footer-->
+    <footer class="footer py-4">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-lg-4 text-lg-start">Copyright &copy; parking-helper 2024</div>
+                        <div class="col-lg-4 my-3 my-lg-0">
+                            <a class="btn btn-dark btn-social mx-2" href="#!"><i class="fab fa-twitter"></i></a>
+                            <a class="btn btn-dark btn-social mx-2" href="#!"><i class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-dark btn-social mx-2" href="#!"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                        <div class="col-lg-4 text-lg-end">
+                            <a class="link-dark text-decoration-none me-3" href="#!">Політика конфіденційності</a>
+                            <a class="link-dark text-decoration-none" href="#!">Умови користування</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+    <!-- Portfolio Modals-->
+    <!-- Portfolio item modal popup-->
+    {% for parking_area in parkings %}
+        <div class="portfolio-modal modal fade" id="parkingModal{{ parking_area.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="close-modal" style="width: 2rem; height: 2rem;" data-bs-dismiss="modal"><img src="{% static 'main/assets/img/close-icon.svg' %}" alt="Close modal" /></div>
+                            <div class="container">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-8">
+                                        <div class="modal-body">
+                                            <!-- Project details-->
+                                            <h2 class="text-uppercase mb-4" style="font-size: 2rem; line-height: 2rem;">{{ parking_area.name }}</h2>
+                                            <div class="row row-cols-auto justify-content-center">
+                                                {% for place in parking_area.parking_place_set.all|dictsort:'number' %}
+                                                    <div class="block justify-content-center mb-3">
+                                                        <div class="place-content" style="position: relative">
+                                                            {% if place.is_place_for_disable and place.is_place_for_electric %}
+                                                                <span class="place-type" style="position: absolute; top: -10px; right: -10px;">
+                                                                    <img src="{% static 'main/assets/img/parking/free-icon-disabled-1656865.png' %}" width="16" height="16">
+                                                                </span>
+                                                                <span class="place-type" style="position: absolute; top: -10px; right: 10px;">
+                                                                    <img src="{% static 'main/assets/img/parking/free-icon-electric-car-1706259.png' %}" width="16" height="16">
+                                                                </span>
+                                                            {% elif place.is_place_for_disable %}
+                                                                <span class="place-type" style="position: absolute; top: -10px; right: -10px;">
+                                                                    <img src="{% static 'main/assets/img/parking/free-icon-disabled-1656865.png' %}" width="16" height="16">
+                                                                </span>
+                                                            {% elif place.is_place_for_electric %}
+                                                                <span class="place-type" style="position: absolute; top: -10px; right: -10px;">
+                                                                    <img src="{% static 'main/assets/img/parking/free-icon-electric-car-1706259.png' %}" width="16" height="16">
+                                                                </span>
+                                                            {% endif %}
+
+
+                                                            {% if place.status == 'PF' %}
+                                                                <img class="place-status mb-0" src="{% static 'main/assets/img/parking/green.png' %}" width="64" height="64" >
+                                                            {% elif place.status == 'PT' %}
+                                                                <img class="place-status mb-0" src="{% static 'main/assets/img/parking/red.png' %}" width="64" height="64" >
+                                                            {% else %}
+                                                                <img class="place-status mb-0" src="{% static 'main/assets/img/parking/yellow.png' %}" width="64" height="64" >
+                                                            {% endif %}
+                                                        </div>
+                                                        <p class="mb-3">#{{ place.number }}</p>
+                                                        <p class="mb-3">Варість: {{ place.parking_cost }}₴</p>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                            <h6>{{ parking_area.info}}</h6>
+                                            <ul class="list-inline">
+                                                <li>
+                                                    <strong>Адресса:</strong> {{ parking_area.street }}
+                                                </li>
+                                                <li>
+                                                    <strong>Кількість місць:</strong> {{ parking_area.count }}
+                                                </li>
+                                            </ul>
+                                            {% if not request.user.is_anonymous %}
+
+
+
+                                                {% if not user_reserved %}
+
+                                                    <!-- Зарезервувати -->
+                                                    <div class="card card-body">
+                                                            <form action="" method="POST" class="col-md-5 mx-auto">
+                                                                {% csrf_token %}
+                                                                 <div class="text-center">
+                                                                    <h5 class="section-heading text-uppercase">Зарезервувати місце</h5>
+                                                                </div>
+                                                                <input type="hidden" id="form_action" name="form_action" value="reserve">
+                                                                <input type="hidden" id="parking_place_id" name="parking_id" value="{{ parking_area.id }}">
+                                                                <div class="form-group required p-2">
+                                                                    <input type="checkbox" id="is_electric" name="is_electric" value="is_electric">
+                                                                    <label for="is_electric">Місце з підзарядкою</label><br>
+                                                                    <input type="checkbox" id="is_invalid" name="is_invalid" value="is_invalid">
+                                                                    <label for="is_invalid">Місце для інвалідів</label><br>
+                                                                </div>
+
+                                                                <div class="form-group required p-2">
+                                                                    <input type="radio" id="is_long_time" name="parking_time" value="is_long_time">
+                                                                    <label for="is_long_time">Довготривала стоянка</label><br>
+                                                                    <input type="radio" id="is_short_time" name="parking_time" value="is_short_time">
+                                                                    <label for="is_short_time">Короткотривала стоянка</label><br>
+                                                                    <input type="radio" id="is_regular_time" checked name="parking_time" value="is_regular_time">
+                                                                    <label for="is_regular_time">Немає значення</label><br>
+                                                                </div>
+                                                                <div>
+                                                                    <label >Початок</label><br>
+                                                                    {{ form.start }}
+                                                                    <label >Кінець</label><br>
+                                                                     {{ form.end }}
+                                                                </div>
+                                                                <div class="form-group required p-2">
+                                                                    <input class="btn btn-primary" type="submit" value="Забронювати місце"/>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+
+                                                {% else %}
+                                                    {% if parking_area in user_reserved %}
+                                                        <!-- Є зарезервовані -->
+                                                        <div class="row px-3 justify-content-center">
+                                                                    <div class="text-center">
+                                                                        <h5 class="section-heading text-uppercase">У вас уже є зарезервоване місце</h5>
+                                                                    </div>
+
+                                                                    <div class="col-lg-6 col-sm-6 ">
+                                                                        <a href="{% url 'reserved' %}"><input class="btn btn-primary my-2" type="button"  value="Переглянути"/></a>
+                                                                    </div>
+                                                                </div>
+                                                    {% else %}
+                                                    <!-- Зарезервувати -->
+                                                    <div class="card card-body">
+                                                            <form action="" method="POST" class="col-md-5 mx-auto">
+                                                                {% csrf_token %}
+                                                                 <div class="text-center">
+                                                                    <h5 class="section-heading text-uppercase">Зарезервувати місце</h5>
+                                                                </div>
+                                                                <input type="hidden" id="form_action" name="form_action" value="reserve">
+                                                                <input type="hidden" id="parking_place_id" name="parking_id" value="{{ parking_area.id }}">
+                                                                <div class="form-group required p-2">
+                                                                    <input type="checkbox" id="is_electric" name="is_electric" value="is_electric">
+                                                                    <label for="is_electric">Місце з підзарядкою</label><br>
+                                                                    <input type="checkbox" id="is_invalid" name="is_invalid" value="is_invalid">
+                                                                    <label for="is_invalid">Місце для інвалідів</label><br>
+                                                                </div>
+
+                                                                <div class="form-group required p-2">
+                                                                    <input type="radio" id="is_long_time" name="parking_time" value="is_long_time">
+                                                                    <label for="is_long_time">Довготривала стоянка</label><br>
+                                                                    <input type="radio" id="is_short_time" name="parking_time" value="is_short_time">
+                                                                    <label for="is_short_time">Короткотривала стоянка</label><br>
+                                                                    <input type="radio" id="is_regular_time" checked name="parking_time" value="is_regular_time">
+                                                                    <label for="is_regular_time">Немає значення</label><br>
+                                                                </div>
+                                                                <div>
+                                                                    <label >Початок</label><br>
+                                                                    {{ form.start }}
+                                                                    <label >Кінець</label><br>
+                                                                     {{ form.end }}
+                                                                </div>
+                                                                <div class="form-group required p-2">
+                                                                    <input class="btn btn-primary" type="submit" value="Забронювати місце"/>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    {% endif %}
+
+                                                {% endif %}
+                                            {% else %}
+                                            <!-- Не авторизовані -->
+                                            <div class="row px-3 justify-content-center">
+                                                <div class="text-center">
+                                                    <h5 class="section-heading text-uppercase">Ви не авторизовані</h5>
+                                                </div>
+
+                                                <div class="col-lg-6 col-sm-6 ">
+                                                    <a href="{% url 'login' %}"><input class="btn btn-primary my-2" type="button"  value="Увійти"/></a>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    {% endfor %}
+{% endblock %}

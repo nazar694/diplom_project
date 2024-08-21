@@ -1,0 +1,35 @@
+{% extends 'main/base.html' %}
+{% load static%}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'main/css/login.css' %}">
+    <div class="main-div">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5 mx-auto">
+                    <div class="card card-body">
+                        <form id="submitForm" method="post" data-parsley-validate="" data-parsley-errors-messages-disabled="true" novalidate="" _lpchecked="1"><input type="hidden" name="_csrf" value="7635eb83-1f95-4b32-8788-abec2724a9a4">
+                            {% csrf_token %}
+                             <div class="text-center">
+                                <h2 class="section-heading text-uppercase">Ви дійсно хочете вийти?</h2>
+                            </div>
+
+                            {% for mes in messages %}
+                                <p> {{ mes }} </p>
+                            {% endfor %}
+                            <div class="row px-3 justify-content-center">
+                                <div class="col-lg-6 col-sm-6 ">
+                                    <a href="{% url 'index' %}"><input class="btn btn-primary my-2" type="button"  value="Ні, повернутись"/></a>
+                                </div>
+
+                                <div class="col-lg-6 col-sm-6 ">
+                                    <input class="btn btn-primary my-2" type="submit" value="Так, вийти"/>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

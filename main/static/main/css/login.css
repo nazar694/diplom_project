@@ -1,0 +1,87 @@
+body{
+  background: #E8D426 !important;
+  font-family: 'Muli', sans-serif;
+
+}
+h1{
+  color: black;
+  padding-bottom: 2rem;
+  font-weight: bold;
+}
+a{
+  color: #333;
+}
+a:hover{
+  color: #E8D426;
+  text-decoration: none;
+}
+input {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+input:focus {
+
+    color: #000;
+    background-color: #fff;
+    border:2px solid #E8D426;
+    outline: 0;
+    box-shadow: none;
+
+}
+
+.btn{
+  background: #E8D426;
+  border: #E8D426;
+}
+.btn:hover {
+  background: #E8D426;
+  border: #E8D426;
+}
+
+.main-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+
+.username {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;
+}
+
+.ml-auto {
+    margin-left: auto !important;
+    text-decoration: none;
+}
+.ml-auto:hover {
+    text-decoration: none;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+
+#submitForm > * {
+    margin: 30px 0;
+}
